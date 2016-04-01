@@ -1,4 +1,4 @@
-package com.lwn314.coolweather.db;
+package com.lwn314.coolweather.model;
 
 /**
  * Created by lwn31 on 2016/3/31.
