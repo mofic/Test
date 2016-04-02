@@ -2,8 +2,8 @@ package com.lwn314.coolweather.util;
 
 import android.text.TextUtils;
 
-import com.lwn314.coolweather.model.City;
 import com.lwn314.coolweather.db.CoolWeatherDB;
+import com.lwn314.coolweather.model.City;
 import com.lwn314.coolweather.model.County;
 import com.lwn314.coolweather.model.Province;
 
@@ -63,4 +63,6 @@ public class Utility {
         }
         return false;
     }
+
+
 }

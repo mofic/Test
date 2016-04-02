@@ -23,17 +23,16 @@ public class HttpUtil {
                     connection.setReadTimeout(8000);
                     InputStream in = connection.getInputStream();
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                    StringBuilder respone = new StringBuilder();
+                    StringBuilder response = new StringBuilder();
                     String line;
-                    while ((line = reader.readLine()) !=null){
-                        respone.append(line);
+                    while ((line = reader.readLine()) != null){
+                        response.append(line);
                     }
                     if (listener != null){
-                        listener.onFinish(respone.toString());
+                        listener.onFinish(response.toString());
                     }
                 }catch (Exception e){
-                    e.printStackTrace();
-                    if (listener !=null){
+                    if (listener != null){
                         listener.onError(e);
                     }
                 }finally {
