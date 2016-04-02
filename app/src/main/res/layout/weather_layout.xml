@@ -8,6 +8,14 @@
         android:layout_width="match_parent"
         android:layout_height="50dp">
 
+        <Button
+            android:background="@drawable/home"
+            android:layout_marginLeft="10dp"
+            android:layout_centerVertical="true"
+            android:id="@+id/switch_city"
+            android:layout_width="30dp"
+            android:layout_height="30dp"/>
+
         <TextView
             android:textSize="24sp"
             android:textColor="#fff"
@@ -15,6 +23,15 @@
             android:id="@+id/city_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+
+        <Button
+            android:background="@drawable/refresh"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:id="@+id/refresh_weather"
+            android:layout_alignParentRight="true"
+            android:layout_width="30dp"
+            android:layout_height="30dp"/>
     </RelativeLayout>
 
     <RelativeLayout
@@ -31,15 +48,7 @@
             android:id="@+id/publish_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-
-        <ImageView
-            android:layout_centerInParent="true"
-            android:layout_below="@id/publish_text"
-            android:id="@+id/img"
-            android:layout_width="wrap_content"
-            android:layout_height="200dp"/>
         <LinearLayout
-            android:layout_below="@id/img"
             android:orientation="vertical"
             android:layout_centerInParent="true"
             android:id="@+id/weather_info_layout"
