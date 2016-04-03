@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.lwn314.coolweather.R;
 import com.lwn314.coolweather.db.CoolWeatherDB;
+import com.lwn314.coolweather.db.WeatherDB;
 import com.lwn314.coolweather.model.City;
 import com.lwn314.coolweather.model.County;
 import com.lwn314.coolweather.model.Province;
@@ -43,6 +44,7 @@ public class ChooseAreaActivity extends Activity {
     private ListView listView;
     private ArrayAdapter<String> adapter;
     private CoolWeatherDB coolWeatherDB;
+    private WeatherDB weatherDB;
     private List<String> dataList = new ArrayList<>();
 
     private List<Province> provinceList;
@@ -58,10 +60,10 @@ public class ChooseAreaActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        isFromWeatherActivity = getIntent().getBooleanExtra("from_weather_activity",false);
+        isFromWeatherActivity = getIntent().getBooleanExtra("from_weather_activity", false);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if (preferences.getBoolean("city_selected",false) && !isFromWeatherActivity){
-            Intent intent = new Intent(this,WeatherActivity.class);
+        if (preferences.getBoolean("city_selected", false) && !isFromWeatherActivity) {
+            Intent intent = new Intent(this, WeatherActivity.class);
             startActivity(intent);
             finish();
         }
@@ -72,6 +74,10 @@ public class ChooseAreaActivity extends Activity {
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dataList);
         listView.setAdapter(adapter);
         coolWeatherDB = CoolWeatherDB.getInstance(this);
+        if (!Utility.isInit()) {
+            weatherDB = WeatherDB.getInstance(this);
+            readFromWeatherServer();
+        }
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -81,16 +87,32 @@ public class ChooseAreaActivity extends Activity {
                 } else if (currentLevel == LEVEL_CITY) {
                     selectedCity = cityList.get(position);
                     queryCounties();
-                }else if (currentLevel == LEVEL_COUNTY){
+                } else if (currentLevel == LEVEL_COUNTY) {
                     String countyCode = countyList.get(position).getCountyCode();
-                    Intent intent = new Intent(ChooseAreaActivity.this,WeatherActivity.class);
-                    intent.putExtra("county_code",countyCode);
+                    Intent intent = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
+                    intent.putExtra("county_code", countyCode);
                     startActivity(intent);
                     finish();
                 }
             }
         });
         queryProvinces();
+    }
+
+    private void readFromWeatherServer() {
+        String address = "https://api.heweather" +
+                ".com/x3/condition?search=allcond&key=444242ac0ed4459f92b1b5a89b5c1605";
+        HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {
+            @Override
+            public void onFinish(final String response) {
+                Utility.handleWeatherResponse(weatherDB, response);
+            }
+
+            @Override
+            public void onError(final Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void queryCounties() {
@@ -144,15 +166,15 @@ public class ChooseAreaActivity extends Activity {
     private void queryFromServer(final String code, final String type) {
         String address;
         int cod = 0;
-        try{
+        try {
             cod = Integer.parseInt(code);
-        }catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             e.printStackTrace();
         }
         if (!TextUtils.isEmpty(code)) {
-            if (cod < 10 || (cod > 100 && cod < 1000) ){
+            if (cod < 10 || (cod > 100 && cod < 1000)) {
                 address = "http://www.weather.com.cn/data/list3/city0" + code + ".xml";
-            }else {
+            } else {
                 address = "http://www.weather.com.cn/data/list3/city" + code + ".xml";
             }
         } else {
@@ -166,9 +188,11 @@ public class ChooseAreaActivity extends Activity {
                 if ("province".equals(type)) {
                     result = Utility.handleProvincesResponse(coolWeatherDB, response);
                 } else if ("city".equals(type)) {
-                    result = Utility.handleCitiesResponse(coolWeatherDB, response, selectedProvince.getId());
+                    result = Utility.handleCitiesResponse(coolWeatherDB, response,
+                            selectedProvince.getId());
                 } else if ("county".equals(type)) {
-                    result = Utility.handleCountriesResponse(coolWeatherDB, response, selectedCity.getId());
+                    result = Utility.handleCountriesResponse(coolWeatherDB, response,
+                            selectedCity.getId());
                 }
                 if (result) {
                     runOnUiThread(new Runnable() {
@@ -222,8 +246,8 @@ public class ChooseAreaActivity extends Activity {
         } else if (currentLevel == LEVEL_CITY) {
             queryProvinces();
         } else {
-            if (isFromWeatherActivity){
-                Intent intent = new Intent(this,WeatherActivity.class);
+            if (isFromWeatherActivity) {
+                Intent intent = new Intent(this, WeatherActivity.class);
                 startActivity(intent);
             }
             finish();
